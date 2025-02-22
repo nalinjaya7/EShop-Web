@@ -1,0 +1,6 @@
+﻿
+@{
+    int categoryID = int.Parse(ViewData["CategoryID"].ToString()); 
+    ViewBag.Title = "Products"; 
+}
+<vc:products-by-category category-id="@categoryID"></vc:products-by-category>

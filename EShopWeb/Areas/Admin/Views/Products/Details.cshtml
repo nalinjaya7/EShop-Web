@@ -1,0 +1,59 @@
+﻿@model ProductViewModel
+
+@{
+    ViewBag.Title = "Product Details";
+}
+
+<h5>@ViewData["Title"]</h5>
+<div>
+
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.ProductSubCategory.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ProductSubCategory.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.BarCode)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.BarCode)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.ItemCode)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ItemCode)
+            </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Image)
+        </dt>
+
+        <dd>
+          <img src="@Model.Image" />
+        </dd>
+        </dl>
+    </div>
+ 
+    <div>
+        <hr />
+        @Html.EShopCoreEncryptedActionButtonLink("Edit", "Edit", "Products", new { id = Model.EnID }, new { @class = "btn btn-default btn-info" })
+        @Html.ActionLink("Back to List", "Index", null,null, new { @class = "btn btn-default btn-info" })
+    </div>
+ 

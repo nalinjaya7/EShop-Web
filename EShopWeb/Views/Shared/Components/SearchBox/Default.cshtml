@@ -1,0 +1,41 @@
+﻿@using EShopModels;
+@model List<SearchBoxModel>
+ 
+@{
+   await Html.RenderPartialAsync("_AngularModalUIScriptPartial");
+}
+ 
+<div ng-controller="salesordercontrollerapp">
+    <input class="homeSearchBox" style="color:black;" ng-change="selectoption(searchText)" id="searchProduct" name="searchProduct" ng-model="searchText" list="names" />
+    <datalist id="names">
+        <option ng-repeat="prod in products | filter:{Name:searchText} | limitTo:5" value="{{prod.Name}}">
+            <ul>
+                <li ng-repeat="price in prod.Prices">
+                    (Price : {{price.UnitPrice}}/{{price.UnitName}},Qty : {{price.AvailableQty}})
+                </li>
+            </ul> 
+        </option>  
+    </datalist> 
+</div>
+  
+<script type="text/javascript">
+   
+    myapp.controller("salesordercontrollerapp",function($scope) {
+        $scope.searchText;
+        $scope.selectedobj;
+        $scope.products = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model)); 
+
+        $scope.selectoption = function(val) { 
+            var objselect = $scope.products.find(t => t.Name == val);
+            if (objselect != undefined || objselect != null) {
+                window.location = '/Products/Details/' + objselect.EnID;
+            }
+        } 
+
+        $scope.angularchange = function (prod) {
+            alert(JSON.stringify(prod));
+        }
+    });
+</script>
+  
+ 

@@ -1,0 +1,47 @@
+﻿@model ProductSubCategoryViewModel
+
+@{
+    ViewBag.Title = "Product SubCategory  Details";
+}
+
+<h5>@ViewData["Title"]</h5>
+
+ <div>
+        <h4></h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.ProductCategory.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.ProductCategory.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.CreatedDate)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.ModifiedDate)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ModifiedDate)
+            </dd>
+
+        </dl>
+    </div>
+    <p>
+    @Html.EShopCoreEncryptedActionButtonLink("Back to List", "SubCategoryByCategory", "ProductSubCategories", new { id = ViewBag.ProductCategoryEnID, Area = "Admin" }, new { @class = "btn btn-default btn-info" })
+        <a href="#" onclick="window.history.back()" class="btn btn-default btn-info">Back to List</a>
+    </p>

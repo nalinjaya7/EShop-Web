@@ -1,0 +1,60 @@
+﻿@model ProductViewModel
+
+@{
+    ViewBag.Title = "Product " + (Model.IsDeleted == true ? "Activate" : "Delete");
+}
+<h5>@ViewData["Title"]</h5>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductSubCategory.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductSubCategory.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BarCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BarCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ItemCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Image)
+        </dt>
+
+        <dd>
+          <img src="@Model.Image" />
+        </dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="EnID" />
+        <div class="form-actions no-color">
+            <input type="submit" @(Model.IsDeleted == true ? "value=Activate" : "value=Delete") class="btn btn-default btn-info" />
+            @Html.ActionLink("Back to List", "Index",null,null, new { @class = "btn btn-default btn-info" }) 
+        </div>
+    }
+</div>

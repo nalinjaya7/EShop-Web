@@ -1,0 +1,213 @@
+﻿@model IEnumerable<ProductPromotionViewModel>
+@{
+    ViewBag.Title = "Product Promotions";
+}
+ 
+
+<div>
+    <div class="pageheadertitle">
+        <h5>@ViewData["Title"]</h5>
+    </div>
+    <div class="pageheadermenu">
+        <a class="btn btn-default btn-info" asp-action="Create">Create New</a>
+    </div>
+</div>
+<br />
+<p>
+    <div asp-validation-summary="All" class="text-danger"></div>
+</p>
+
+@{
+    await Html.RenderPartialAsync("_AngularAdminGridUIScriptPartial");
+}
+
+<script type="text/javascript">
+
+    var app = angular.module("uigridApp", ["ui.grid", "ui.grid.pagination", "ui.grid.selection", "ui.grid.exporter", "ui.bootstrap"]);
+
+    app.controller("uigridCtrl", function ($scope, $templateCache) {
+        $scope.datePicker = {
+            options: {
+                formatMonth: 'MM',
+                startingDay: 1
+            },
+            format: "yyyy-MM-dd"
+        };
+        $scope.showDatePopup = [];
+        $scope.showDatePopup.push({ opened: false });
+        $scope.showDatePopup.push({ opened: false });
+
+        $templateCache.put('ui-grid/date-cell',
+            "<div class='ui-grid-cell-contents'>{{COL_FIELD | date:'yyyy-MM-dd'}}</div>"
+        );
+        $templateCache.put('ui-grid/ui-grid-date-filter',
+            "<div class=\"ui-grid-filter-container\" ng-repeat=\"colFilter in col.filters\" >" +
+            "<input type=\"text\" uib-datepicker-popup=\"{{datePicker.format}}\" " +
+            "datepicker-options=\"datePicker.options\" " +
+            "datepicker-append-to-body=\"true\" show-button-bar=\"false\"" +
+            "is-open=\"showDatePopup[$index].opened\" class=\"ui-grid-filter-input ui-grid-filter-input-{{$index}}\"" +
+            "style=\"font-size:1em; width:8em!important\" ng-model=\"colFilter.term\" ng-attr-placeholder=\"{{colFilter.placeholder || ''}}\" " +
+            " aria-label=\"{{colFilter.ariaLabel || aria.defaultFilterLabel}}\" />" +
+
+            "<span style=\"padding-left:0.3em;\"><button type=\"button\" class=\"btn btn-default btn-sm\" ng-click=\"showDatePopup[$index].opened = true\">" +
+            "<i class=\"glyphicon glyphicon-calendar\"></i></button></span>" +
+
+            "<div role=\"button\" class=\"ui-grid-filter-button\" ng-click=\"removeFilter(colFilter, $index)\" ng-if=\"!colFilter.disableCancelFilterButton\" ng-disabled=\"colFilter.term === undefined || colFilter.term === null || colFilter.term === ''\" ng-show=\"colFilter.term !== undefined && colFilter.term !== null && colFilter.term !== ''\">" +
+            "<i class=\"ui-grid-icon-cancel\" ui-grid-one-bind-aria-label=\"aria.removeFilter\">&nbsp;</i></div></div><div ng-if=\"colFilter.type === 'select'\"><select class=\"ui-grid-filter-select ui-grid-filter-input-{{$index}}\" ng-model=\"colFilter.term\" ng-attr-placeholder=\"{{colFilter.placeholder || aria.defaultFilterLabel}}\" aria-label=\"{{colFilter.ariaLabel || ''}}\" ng-options=\"option.value as option.label for option in colFilter.selectOptions\"><option value=\"\"></option></select><div role=\"button\" class=\"ui-grid-filter-button-select\" ng-click=\"removeFilter(colFilter, $index)\" ng-if=\"!colFilter.disableCancelFilterButton\" ng-disabled=\"colFilter.term === undefined || colFilter.term === null || colFilter.term === ''\" ng-show=\"colFilter.term !== undefined && colFilter.term != null\"><i class=\"ui-grid-icon-cancel\" ui-grid-one-bind-aria-label=\"aria.removeFilter\">&nbsp;</i></div></div>"
+        );
+
+        $scope.highlightFilteredHeader = function (row, rowRenderIndex, col, colRenderIndex) {
+
+            if (col.filters[0].term) {
+
+                return 'header-filtered';
+            } else {
+                return '';
+            }
+        };
+
+        $scope.gridOptions = {
+            enableFiltering: true,
+            enableSorting: true,
+            paginationPageSizes: [25, 50, 75],
+            paginationPageSize: 25,
+            columnDefs: [
+                { field: 'Name', width: '50%', name: 'Promotion Name' },
+                {
+                    field: 'StartDate',
+                    name: 'Start Date',
+                    cellTooltip: true,
+                    cellFilter: 'date:\'yyyy-MM-dd\'',
+                    cellTemplate: 'ui-grid/date-cell',
+                    filterHeaderTemplate: 'ui-grid/ui-grid-date-filter',
+                    width: '20%',
+                    filters: [
+                        {
+                            condition: function (term, value, row, column) {
+                                if (!term) return true;
+                                var valueDate = new Date(value);
+                                return valueDate >= term;
+                            },
+                            placeholder: 'Greater than or equal'
+                        },
+                        {
+                            condition: function (term, value, row, column) {
+                                if (!term) return true;
+                                var valueDate = new Date(value);
+                                return valueDate <= term;
+                            },
+                            placeholder: 'Less than or equal'
+                        }
+                    ],
+                    headerCellClass: $scope.highlightFilteredHeader
+                },
+                {
+                    field: 'EndDate',
+                    name: 'End Date',
+                    cellTooltip: true,
+                    cellFilter: 'date:\'yyyy-MM-dd\'',
+                    cellTemplate: 'ui-grid/date-cell',
+                    filterHeaderTemplate: 'ui-grid/ui-grid-date-filter',
+                    width: '20%',
+                    filters: [
+                        {
+                            condition: function (term, value, row, column) {
+                                if (!term) return true;
+                                var valueDate = new Date(value);
+                                return valueDate >= term;
+                            },
+                            placeholder: 'Greater than or equal'
+                        },
+                        {
+                            condition: function (term, value, row, column) {
+                                if (!term) return true;
+                                var valueDate = new Date(value);
+                                return valueDate <= term;
+                            },
+                            placeholder: 'Less than or equal'
+                        }
+                    ],
+                    headerCellClass: $scope.highlightFilteredHeader
+                },
+                {
+                    field: ' ',
+                    width: '10%',
+                    exporterSuppressExport: true,
+                    enableFiltering: false,
+                    enableSorting: false,
+                    cellTemplate: '<div class="ui-grid-cell">&nbsp;<a ng-if="row.entity.IsDeleted==false" href="/Admin/ProductPromotions/Edit/{{row.entity.EnID}}"><i class="glyphicon glyphicon-edit colorspringgreen" title="Edit"></i>&nbsp;&nbsp;</a><a href="/Admin/ProductPromotions/Details/{{row.entity.EnID}}"><i class="glyphicon glyphicon-eye-open" title="Details"></i>&nbsp;&nbsp;</a><a href="/Admin/ProductPromotions/Delete/{{row.entity.EnID}}">' +
+                        '<i ng-if="row.entity.IsDeleted==false" class="glyphicon glyphicon-trash colorred" title="Delete"></i>' +
+                        '<i ng-if="row.entity.IsDeleted==true" class="glyphicon glyphicon-open colorspringgreen" title="Delete"></i>' +
+                        '</a></div>'
+                }
+            ],
+            onRegisterApi: function (gridApi) {
+                $scope.grid1Api = gridApi;
+            },
+            enableRowSelection: true,
+            enableGridMenu: true,
+            enableSelectAll: true,
+            exporterMenuPdf: true,
+            exporterMenuExcel: false,
+            exporterCsvFilename: 'ProductPromotions.csv',
+            exporterPdfDefaultStyle: {
+                fontSize: 9
+            },
+            exporterPdfTableStyle: {
+                margin: [30, 30, 30, 30]
+            },
+            exporterPdfTableHeaderStyle: {
+                fontSize: 10,
+                bold: true,
+                italics: true,
+                color: 'red'
+            },
+            exporterPdfHeader: {
+                text: "Product Promotions",
+                style: 'headerStyle'
+            },
+            exporterPdfFooter: function (currentPage, pageCount) {
+                return {
+                    text: currentPage.toString() + ' of ' + pageCount.toString(),
+                    style: 'footerStyle'
+                };
+            },
+            exporterPdfCustomFormatter: function (docDefinition) {
+                docDefinition.styles.headerStyle = {
+                    fontSize: 22,
+                    bold: true
+                };
+                docDefinition.styles.footerStyle = {
+                    fontSize: 10,
+                    bold: true
+                };
+                return docDefinition;
+            },
+            exporterPdfOrientation: 'portrait',
+            exporterPdfPageSize: 'LETTER',
+            exporterPdfMaxGridWidth: 500,
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-wareHouse"))
+        };
+        $scope.promotions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+        $scope.gridOptions.data = $scope.promotions;
+    });
+
+</script>
+
+<style type="text/css">
+    .myGrid {
+        width: 100%;
+        height: 555px;
+    }
+
+    .ui-grid-cell a {
+        text-decoration: none;
+    }
+</style>
+
+<div ng-app="uigridApp">
+    <div ng-controller="uigridCtrl">
+        <div ui-grid="gridOptions" ui-grid-pagination ui-grid-auto-resize ui-grid-selection ui-grid-exporter class="myGrid"></div>
+    </div>
+</div>
+ 

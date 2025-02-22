@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ProductViewModel>
+@{
+    ViewBag.Title = "Products";
+}
+<div>
+    <div class="pageheadertitle">
+        <h5>@ViewData["Title"]</h5>
+    </div>
+    <div class="pageheadermenu">
+       
+    </div>
+</div>
+<br />
+
+<div class="form-group">
+     
+    <div style="margin-top:12px;">
+        @foreach(ProductViewModel modelobj in Model)  
+        {        
+            <div style="border:1px solid #333;background-color:#f1f1f1;border-radius:5px;padding:16px;height:250px;margin-left:auto;margin-right:0;margin-bottom:4px;width:16.6667%;display:inline-block;" align="center">
+                <h4 class="text-nowrap overflow-hidden" title="@modelobj.Name">
+                    @Html.ActionLink(modelobj.Name,"Details","Products",new{id=modelobj.EnID})                   
+                </h4>
+                <img src="@modelobj.Image" width="100" height="100" />  
+                <div class="shoppingcartcell">
+                    @if (modelobj.Inventories != null && modelobj.Inventories.Count > 0)
+                    {
+                        <div class="text-green">In Stock</div>
+                        <div class="text-green">Qty @(modelobj.Inventories.Sum(r => r.Quantity))</div>
+                    }
+                    else
+                    {
+                        <label class="text-danger">Out Of Stock</label>
+                    }
+                </div>
+                <input type="button" name="add_to_cart" style="margin-top:5px;" class="btn btn-info form-control" value="Add to Cart" ng-click="AddToList(product,'prd'+product.ID,'qty'+product.ID)" />
+            </div>        
+        }
+    </div>
+</div>
+
+@section Scripts{
+    @{
+        await Html.RenderPartialAsync("_AngularAdminModalUIScriptPartial");
+    }
+}

@@ -1,0 +1,13 @@
+﻿@model EShopWeb.Models.ProductUploadModel
+
+@{
+    ViewBag.Title = "Product Upload";
+}
+
+<h5>@ViewData["Title"]</h5>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_AdminValidationScriptsPartial");
+    }
+}

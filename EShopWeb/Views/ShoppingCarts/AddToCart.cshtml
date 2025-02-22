@@ -1,0 +1,45 @@
+﻿@model ShoppingCartItemViewModel
+ 
+<div class="modal-header btn-info"> 
+    <label class="modal-title control-label col-md-11">Add To Cart</label>
+    <label class="modal-title control-label col-md-1" ng-click="$ctrl.cancel()">X</label>    
+</div>
+<div class="modal-body" id="modal-body">
+    <script type="text/ng-template" id="alert.html">
+        <div ng-transclude></div>
+    </script>
+    <div uib-alert ng-repeat="alert in alerts" template-url="alert.html" dismiss-on-timeout="5000" ng-class="'alert-'+alert.type" close="closeAlert($index)">
+        {{alert.msg}}
+    </div>
+    <div class="form-group">
+        <label for="Productlist" class="control-label col-md-4">Product Name</label>
+        <div class="col-md-8">                
+            <label class="control-label col-md-8">{{productobj.Name}}</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-4">Unit Type</label>
+        <div class="col-md-8">
+            <select ng-change="onUnitChanged(selectedUnitItemCode)" id="unitcode" name="unitcode" ng-model="selectedUnitItemCode" class="form-control col-md-8">
+                <option ng-repeat="inv in productobj.Inventories track by inv.Code" value="{{inv.Code}}">{{inv.UnitChart.UnitChartName}} - Price : {{inv.SellingPrice}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-4">Available Qty</label>
+        <div class="col-md-8">
+            <label class="control-label col-md-8">{{selectedUnitItem.quantity}}&nbsp;</label>
+        </div> 
+    </div>
+    <div class="form-group">
+        <label class="control-label col-md-4">Order Qty</label>
+        <div class="col-md-8">
+        <input ng-pattern="/^(0|[0-9][0-9]*)$/" type="number" id="qty" name="qty" ng-model="Quantity" class="form-control col-md-8" />
+        </div>
+    </div>  
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">Add To Cart</button>
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.cancel()">Cancel</button>
+</div>
+ 

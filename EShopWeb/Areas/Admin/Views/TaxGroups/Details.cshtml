@@ -1,0 +1,53 @@
+﻿@model TaxGroupViewModel
+
+@{
+    ViewBag.Title = "Tax Group Details";
+}
+
+<h5>@ViewData["Title"]</h5>
+<div>
+    <h4>TaxGroup</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TaxCode)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TaxCode)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TaxRate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TaxRate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsDeleted)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsDeleted)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ModifiedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ModifiedDate)
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.EShopCoreEncryptedActionButtonLink("Edit", "Edit", "TaxGroups", new { id = Model.EnID }, new { @class = "btn btn-default btn-info" })
+    @Html.ActionLink("Back to List", "Index", null, null, new { @class = "btn btn-default btn-info" })
+</div>

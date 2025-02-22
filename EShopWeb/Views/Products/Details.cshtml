@@ -1,0 +1,110 @@
+﻿@model ProductViewModel
+@{
+    ViewBag.Title = "Product Details";
+    await Html.RenderPartialAsync("_AngularModalUIScriptPartial");
+}
+
+<div>
+    <div>
+        <h5>@ViewData["Title"]</h5>
+    </div>
+</div>
+<br />
+
+<div class="form-group">   
+        <div style="margin-top:12px;text-align:center;" ng-controller="myCtrl">
+        <h4 class="text-nowrap overflow-hidden" title="{{product.Name}}">
+            {{product.Name}}               
+            </h4>
+            <img ng-src="{{product.Image}}" title="image" width="200" height="200" />
+            <div class="shoppingcartcell">
+                <div class="text-green" ng-if="product.IsInventoryAvailable">In Stock</div>
+                <div class="text-danger" ng-if="!product.IsInventoryAvailable">Out Of Stock</div>
+                <div class="text-green">{{product.IsInventoryAvailable ? 'Price ' + product.SellingPrice : '&nbsp;'}}</div>
+            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <input type="button" id="filterButton" ng-click='open(product)' name="add_to_cart" style="margin-top:5px;width:170px;" class="btn btn-info form-control" value="Add to Cart" />
+            }  
+    </div>
+</div>
+<script type="text/javascript">
+
+    myapp.controller('myCtrl', function ($scope, $uibModal) {
+
+        $scope.id = 0;
+        $scope.product = null;
+        $scope.open = function (product) {
+            $scope.product = product;
+            var modalContent = $uibModal.open({
+                templateUrl: '/ShoppingCarts/AddToCart',
+                controller: 'ModalInstanceCtrl',
+                controllerAs: '$ctrl',
+                resolve: {
+                    product: function () {
+                        return $scope.product;
+                    }
+                }
+            });
+        }
+        $scope.product = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+ 
+    });
+
+    myapp.controller('ModalInstanceCtrl', function ($scope, $http, $uibModalInstance, product) {
+        $scope.alerts = [];
+        var $ctrl = this;
+        $scope.selectedUnitItem = null;
+        $scope.selectedUnitItemCode = null;
+        $scope.inventory = null;
+        $scope.productobj = product;
+
+        $ctrl.ok = function () {
+            console.log(JSON.stringify($scope.selectedUnitItem));
+            if ($scope.selectedUnitItem != null && $scope.Quantity > 0) {
+                $http({
+                    method: 'POST',
+                    url: '/ShoppingCarts/PostAddToCart/' + $scope.productobj.EnID,
+                    data: { 
+                        "UnitChartID": $scope.selectedUnitItem.unitChartID, 
+                        "Quantity": $scope.Quantity,
+                        "ProductID":$scope.selectedUnitItem.productID,
+                        "InventoryID":$scope.selectedUnitItem.inventoryID,
+                        "UnitPrice":$scope.selectedUnitItem.sellingPrice
+                    } 
+                }).then(function successCallback(response) {                   
+                    $scope.alerts.push({ msg: response.data.msg, type: 'success' });
+                    $uibModalInstance.close('ok');
+                }, function errorCallback(response) { 
+                    console.log(JSON.stringify(response.data));
+                    $scope.alerts.push({ msg: response.data.msg, type: 'danger' });
+                });
+            }
+            else { 
+                $scope.alerts.push({ msg: 'Please select unit type and enter quantity', type: 'danger' });
+            }
+        };
+
+        $ctrl.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
+
+        $scope.closeAlert = function (index) {
+            $scope.alerts.splice(index, 1);
+        };
+
+        $scope.onUnitChanged = function (code) {
+            $http({
+                method: 'GET',
+                url: '/Products/GetInventoryByCode/' + code
+            }).then(function successcallback(response) { 
+                $scope.selectedUnitItem = response.data.inventory;
+            }, function ErrorCallBack(response) {
+                $scope.alerts.push({ msg: 'Error occured', type: 'danger' }); 
+                $scope.selectedUnitItem = null;
+            });
+        };
+
+    });
+
+</script>

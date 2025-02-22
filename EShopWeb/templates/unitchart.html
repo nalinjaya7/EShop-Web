@@ -1,0 +1,89 @@
+﻿<div>
+    <div class="modal-header">
+        <h3 class="modal-title">Unit Chart</h3>
+    </div>
+    <div class="modal-body" ng-init="init()">
+
+        <ng-form name="frm4" novalidate>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Chart Name</label>
+                <div class="col-md-10" style="margin-bottom:10px;">
+                    <input ng-required="true" type="text" name="unitChartName" class="form-control" ng-model="unitChartName" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Unit Type</label>
+                <div class="col-md-10" style="margin-bottom:10px;">
+                    <select class="form-control" name="unitchartame" ng-required="true" ng-options="item.Name for item in unittypes" ng-model="unitType"></select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Quantity</label>
+                <div class="col-md-10" style="margin-bottom:10px;">
+                    <input class="form-control" name="qty" ng-pattern="/^(0|[1-9][0-9]*)$/" ng-required="true" type="text" ng-model="QuantityInBox" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-10" style="float:left;margin-bottom:10px;">
+                    <input type="button" ng-disabled="frm4.$invalid" class="btn btn-default btn-info" value="Add UnitChart" ng-click="AddToChartList()" />
+                    <input type="button" ng-show="chartupdateindex != null" ng-disabled="frm4.$invalid" ng-click="updateToChartList(chartupdateindex)" class="btn btn-default btn-info" value="Update" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-10">
+                    <table class="webgrid-table">
+                        <thead>
+                            <tr class="webgrid-header" style="color:white">
+                                <th>Unit Chart Name</th>
+                                <th>UnitType</th>
+                                <th>Quantity</th>                              
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itm in UnitCharts track by $index" class="webgrid-row-style">
+                                <td>
+                                    {{itm.UnitChartName}}
+                                </td>
+                                <td>
+                                    {{itm.UnitTypeName}}<input type="hidden" value="{{itm.ID}}" name="UnitCharts[{{$index}}].ID" />
+                                    <input type="hidden" value="{{itm.UnitTypeID}}" name="UnitCharts[{{$index}}].UnitTypeID" />
+                                    <input type="hidden" value="{{itm.ProductID}}" name="UnitCharts[{{$index}}].ProductID" />
+                                </td>
+                                <td>
+                                    {{itm.Quantity}}
+                                    <input type="hidden" value="{{itm.Quantity}}" name="UnitCharts[{{$index}}].Quantity" />
+                                </td>                               
+                                <td>
+                                    <i type="button" ng-click="updateChartItem($index)" class="glyphicon glyphicon-edit colorspringgreen" />
+                                    <i type="button" ng-click="removeChartItem($index)" class="glyphicon glyphicon-trash colorred" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </ng-form>
+
+        <button class="btn btn-default btn-info" type="button" ng-click="ok()">OK</button>
+        <button class="btn btn-default btn-info" type="button" ng-click="cancel()">Cancel</button>
+
+    </div>
+    <div class="modal-footer" style="height:5px">
+
+    </div>
+</div>
+
+

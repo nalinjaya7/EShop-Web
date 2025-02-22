@@ -1,0 +1,347 @@
+﻿@model ProductViewModel
+
+@{
+    ViewBag.Title = "Product Create";
+}
+
+<h5>@ViewData["Title"]</h5>
+
+<div class="row">
+    <div class="col-md-7" ng-app="inventoryApp" ng-controller="inventorycontroller">
+        @using (Html.BeginForm("Create", "Products", new { id = ViewBag.encryptedId }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(model => model.RowVersion)
+
+            <div class="form-group">
+                <label for="ProductCategoryID" class="control-label">Product Category</label>
+                <select class="form-control" asp-for="ProductCategoryID" ng-change="categoryChanged(ProductCategory)" name="ProductCategoryID" id="ProductCategoryID" ng-options="item.Text for item in productCategories track by item.Value" ng-model="ProductCategory"></select>
+                <span asp-validation-for="ProductCategoryID" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="ProductSubCategoryID" class="control-label">Product SubCategory</label>
+                <select class="form-control" asp-for="ProductSubCategoryID" name="ProductSubCategoryID" id="ProductSubCategoryID" ng-options="item.text for item in productSubCategories track by item.value" ng-model="ProductSubCategory"></select>
+                <span asp-validation-for="ProductSubCategoryID" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BarCode, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.BarCode, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ItemCode, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.ItemCode, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ItemCode, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ReOrderLevel, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.ReOrderLevel, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ReOrderLevel, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.TaxInclude, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.TaxInclude)
+                @Html.ValidationMessageFor(model => model.TaxInclude, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.TaxGroupID, htmlAttributes: new { @class = "control-label" })
+                @Html.DropDownListFor(model => model.TaxGroupID, null, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.TaxGroupID, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProductImage" class="control-label"></label>
+                <input asp-for="ProductImage" type="file" class="form-control" />
+                <span asp-validation-for="ProductImage" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <fieldset>
+                    <legend>Unit Charts</legend>
+                </fieldset>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-2">Unit Chart</label>
+                <div class="col-md-10">
+                    <input type="button" value="Add UnitCharts" class="btn btn-default btn-info" ng-click="open()" style=" float:left;margin-left:5px;" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-10" style="float:left">
+                    <table class="webgrid-table">
+                        <thead>
+                            <tr class="webgrid-header" style="color:white">
+                                <th>Chart Name</th>
+                                <th>Unit Name</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="itm in UnitCharts track by $index" class="webgrid-row-style">
+                                <td>
+                                    {{itm.UnitChartName}}
+                                    <input type="hidden" value="{{itm.UnitTypeID}}" name="UnitCharts[{{$index}}].UnitTypeID" />
+                                    <input type="hidden" value="{{itm.UnitChartName}}" name="UnitCharts[{{$index}}].UnitChartName" />
+                                </td>
+                                <td>
+                                    {{itm.UnitTypeName}}
+                                    <input type="hidden" value="{{itm.ProductID}}" name="UnitCharts[{{$index}}].ProductID" />
+                                </td>
+                                <td>
+                                    {{itm.Quantity}}
+                                    <input type="hidden" value="{{itm.Quantity}}" name="UnitCharts[{{$index}}].Quantity" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="form-group">
+
+                <input type="submit" ng-click="setdefaultvalues()" value="Save" class="btn btn-default btn-info" />
+                @Html.ActionLink("Back to List", "Index", null, null, new { @class = "btn btn-default btn-info" })
+
+            </div>
+
+        }         
+    </div>
+</div>
+
+<input value="Click" data-toggle="modal" data-target="#One1" />
+<div id="One1">
+    Nalin Jayawardana
+</div>
+
+<script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="~/lib/angular.js/angular.js"></script>
+<script type="text/javascript" src="~/lib/angular-route/angular-route.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui/angular-ui.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui-bootstrap/ui-bootstrap.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#TaxGroupID").prop("disabled", true);
+
+        if ($("#TaxInclude").is(":checked")) {
+            $("#TaxGroupID").prop("disabled", false);
+        }
+        else {
+            $("#TaxGroupID").prop("disabled", true);
+        }
+
+        $("#TaxInclude").change(function () {
+            var $input = $(this);
+            if ($input.is(":checked")) {
+                $("#TaxGroupID").prop("disabled", false);
+            }
+            else {
+                $("#TaxGroupID").prop("disabled", true);
+            }
+        });
+    });
+
+    var myapp = angular.module("inventoryApp", []); //'ui.bootstrap'
+
+    myapp.controller("inventorycontroller", ['$scope','$log', '$http', function ($scope, $log,$http) {
+
+    $scope.UnitCharts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.UnitCharts)); 
+    $scope.productID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.EnID));
+    $scope.productSubCategories = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductSubCategoryID));
+    $scope.productCategories = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductCategoryID));
+
+    $scope.ProductCategoryID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductCategoryID));
+    $scope.ProductSubCategoryID =  @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductSubCategoryID));
+    $scope.ProductCategory = $scope.productCategories.find(c => c.Value == $scope.ProductCategoryID.toString());
+    $scope.ProductSubCategory = { text: 'SELECT SubCategory', value: 0 };// $scope.productSubCategories.find(c => c.Value == $scope.ProductSubCategoryID.toString());
+
+    $scope.unitChart;
+    $scope.inventoryID = 0;
+    $scope.updateindex = null;
+    $scope.reservedQuantity = 0;
+
+    $scope.categoryChanged = function (ff) {
+        var response = $http({
+            method: 'GET',
+            url: '@Url.Action("GetProductSubCategories","Products")/?CategoryId=' + $scope.ProductCategory.Value
+        }).then(function success(result) {
+            $scope.productSubCategories = result.data.subCategories;
+            $scope.productSubCategories.splice(0, 0, { text: 'SELECT SubCategory', value: 0 });
+            $scope.ProductSubCategory = $scope.productSubCategories.find(c => c.value == 0);
+        }, function error(eror) {
+            console.log(JSON.stringify(eror));
+        });
+    }
+
+    $scope.removeItem = function (itemindex) {
+        $scope.UnitCharts.splice(itemindex, 1);
+    }
+
+    $scope.open = function (size) {
+            alert('jkk');
+        var modalInstance = $model.open({
+            size: size,
+            animation: false,
+            backdrop: 'static',
+            templateUrl: 'templates/unitchart.html',
+            controller: 'ModalInstanceCtrl',
+            resolve: {
+                user: function () {
+                    return $scope.user;
+                }
+            }
+        });
+        modalInstance.result.then(function (response) {
+            debugger;
+            $scope.currentUser = response;
+            $state.go('user.detail', { 'userId': response.UserId });
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+ 
+}]);
+
+    ////////////////////////////////////Unit Chart/////////////////////////////////////////
+
+    myapp.controller("ModalInstanceCtrl", function ($scope, $uibModalInstance, $http) {
+        $scope.productID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.EnID));
+    $scope.UnitCharts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.UnitCharts));
+    $scope.unitChartName = '';
+    $scope.QuantityInBox = 0;
+    $scope.chartupdateindex = null;
+
+    $scope.ok = function () {
+        $uibModalInstance.close($scope.UnitCharts);
+    };
+
+    $scope.cancel = function () {
+        $uibModalInstance.dismiss('cancel');
+    }
+
+    $scope.AddToChartList = function () {
+        let y = -1;
+        if ($scope.UnitCharts == 1) {
+            y = -1;
+            $scope.UnitCharts = [];
+        }
+        else {
+            y = $scope.UnitCharts.findIndex(recd => recd.UnitTypeID == $scope.unitType.ID);
+        }
+        if (y === -1) {
+            $scope.UnitCharts.push(
+                {
+                    ID: 0,
+                    UnitTypeID: $scope.unitType.ID,
+                    Name: $scope.unitType.Name,
+                    ProductID: $scope.productID,
+                    Quantity: $scope.QuantityInBox,
+                    CreatedDate: (new Date()).toLocaleString(),
+                    ModifiedDate: (new Date()).toLocaleString(),
+                    RowVersion: '',
+                    UnitChartName: $scope.unitChartName,
+                    UnitTypeName: $scope.unitType.Name,
+                    unitType: $scope.unitType
+                }
+            );
+        }
+        else {
+            alert('Already exists');
+        }
+        $scope.unitType = null;
+        $scope.QuantityInBox = 0;
+    }
+
+    $scope.updateChartItem = function (iteminddex) {
+        $scope.unitType = $scope.unittypes.find(w => w.ID == $scope.UnitCharts[iteminddex].UnitTypeID);
+        $scope.QuantityInBox = $scope.UnitCharts[iteminddex].Quantity;
+        $scope.unitChartName = $scope.UnitCharts[iteminddex].UnitChartName;
+        $scope.chartupdateindex = iteminddex;
+    }
+
+    $scope.updateToChartList = function (iteminddex) {
+        $scope.UnitCharts[iteminddex].UnitTypeID = $scope.unitType.ID;
+        $scope.UnitCharts[iteminddex].Quantity = $scope.QuantityInBox;
+        $scope.chartupdateindex = null;
+        $scope.unitType = null;
+        $scope.QuantityInBox = 0;
+        $scope.UnitCharts[iteminddex].unitType = $scope.unitType;
+        $scope.UnitCharts[iteminddex].UnitChartName = $scope.unitChartName;
+        $scope.unitChartName = '';
+    }
+
+    $scope.removeChartItem = function (itemindex) {
+        if (confirm('Are you sure to delete this unitchart?')) {
+            var unitchart = $scope.UnitCharts[itemindex];
+            if (unitchart.ID == 0) {
+                $scope.UnitCharts.splice(itemindex, 1);
+            }
+            else {
+                var response = $http({
+                    method: 'DELETE',
+                    url: '@Url.Action("DeleteUnitChart","Products")?UnitchartID=' + unitchart.ID + "&ProductID=" + $scope.productID
+                }).then(function success(data) {
+                    $scope.UnitCharts = data.data.unitcharts;
+                }, function error(data) {
+                    console.log(JSON.stringify(data));
+                });
+            }
+        }
+    }
+
+    $scope.setdefaultvalues = function () {
+        $scope.quantity = 0;
+        $scope.reservedQuantity = 0;
+        $scope.QuantityInBox = 0;
+    }
+
+    $scope.init = function () {
+        var response2 = $http({
+            method: 'GET',
+            url: '@Url.Action("GetUnitTypes","Products")'
+        }).then(function success(rdata) {
+            $scope.unittypes = rdata.data.UnitTypes;
+        }, function error(data) {
+            console.log(JSON.stringify(data));
+        });
+
+        var response3 = $http({
+            method: 'GET',
+            url: '@Url.Action("GetUnitChartsByProduct", "Products")?ProductID=' + $scope.productID
+        }).then(function success(data) {
+            $scope.UnitCharts = data.data.Unitcharts;
+        }, function error(data) {
+            console.log(JSON.stringify(data));
+        });
+    }
+});
+
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_AdminValidationScriptsPartial");
+    }
+}

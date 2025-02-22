@@ -1,0 +1,45 @@
+﻿@model ProductCategoryViewModel
+
+@{
+    ViewBag.Title = "Product Category " + (Model.IsDeleted == true ? "Activate" : "Delete");
+}
+
+<h5>@ViewData["Title"]</h5>
+<div> 
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>        
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ModifiedDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ModifiedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsDeleted)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsDeleted)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="EnID" />
+        <div class="form-actions no-color">
+            <input type="submit" @(Model.IsDeleted == true ? "value=Activate" : "value=Delete") class="btn btn-default btn-info" />
+            @Html.ActionLink("Back to List", "Index", null, null, new { @class = "btn btn-default btn-info" })
+        </div>
+    </form>
+</div>
+ 

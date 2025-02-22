@@ -1,0 +1,26 @@
+﻿@using EShopModels;
+@model List<ProductCategory>
+@{
+    ViewData["Title"] = "Home";
+}
+ 
+@foreach(ProductCategory cat in Model)
+{
+    @if (cat.ProductSubCategories.Count > 0)
+    {
+        <a class="btn btn-info left-dropdown-menu" style="width:98%;font-weight:bold;color:wheat;background-color: #1ddaf2;" data-bs-toggle="collapse" href="#cat@(cat.ID)" role="button" aria-expanded="true" aria-controls="catw">
+           @cat.Name
+        </a>
+
+        <div id="cat@(cat.ID)" class="left-dropdown-menu collapse show">
+            @foreach (ProductSubCategory subcat in cat.ProductSubCategories)
+            {
+              <li class="btn-info m-1 p-1 shadow-sm">                   
+                 <a style="text-decoration:none;font-size:15px;" asp-area="" asp-route-SubCategory="@subcat.ID" asp-controller="Products"
+                  asp-action="GetProductsViewBySubCategory">@subcat.Name</a>
+              </li>
+            }            
+        </div>
+    } 
+} 
+ 

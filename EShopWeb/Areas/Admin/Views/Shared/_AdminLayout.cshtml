@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EShop</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    </environment>
+    <environment include="Production">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    </environment>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/glyphiconIcons.css" asp-append-version="true" /> 
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow btn-info">
+            <img alt="companylogo" width="200" height="40" src="~/images/2.png" />
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"> </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="nav navbar-nav flex-grow-1 text-white ">                  
+                        <li class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownGeneral" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                General
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+ 
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="UnitTypes" asp-action="Index">Unit Types</a></li> 
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="TaxGroups" asp-action="Index">Tax Groups</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownProducts" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Products
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="Index">Products</a></li>
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="ProductCategories" asp-action="Index">Product Categories</a></li>
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="ProductPromotions" asp-action="Index">Promotions</a></li> 
+                                <li class="btn-info"><a class="nav-link" asp-area="Admin" asp-controller="Products" asp-action="ProductUpload">Product Upload</a></li>
+                            </ul>
+                        </li> 
+                        <li><a class="nav-link" asp-area="Admin" asp-controller="EShopUsers" asp-action="Index">Users</a></li> 
+                    </ul>  
+                    <partial name="_LoginPartial" />
+                </div> 
+            </div>
+        </nav> 
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+   
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - EShop - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    </environment>
+    <environment include="Production">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    </environment>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

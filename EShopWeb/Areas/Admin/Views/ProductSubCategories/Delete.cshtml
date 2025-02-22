@@ -1,0 +1,32 @@
+﻿@model ProductSubCategoryViewModel
+
+@{
+    ViewBag.Title = "Product SubCategory " + (Model.IsDeleted == true ? "Activate" : "Delete");
+}
+
+<h5>@ViewData["Title"]</h5>
+ 
+<div> 
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="EnID" />
+        <div class="form-actions no-color">
+            <input type="submit" @(Model.IsDeleted == true ? "value=Activate" : "value=Delete") class="btn btn-default btn-info" />
+            @Html.EShopCoreEncryptedActionButtonLink("Back to List", "SubCategoryByCategory", "ProductSubCategories", new { id = ViewBag.ProductCategoryEnID,Area="Admin" }, new { @class = "btn btn-default btn-info" })
+        </div>
+    }
+</div>

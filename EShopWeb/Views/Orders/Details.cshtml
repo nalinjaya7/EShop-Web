@@ -1,0 +1,65 @@
+﻿@model OrderViewModel
+
+@{
+    ViewBag.Title = "Order Details";
+}
+<h5>@ViewData["Title"]</h5>
+<div>
+   
+    <hr />
+    <dl class="row1">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderNo)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.OrderNo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.Total)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SalesDate)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.SalesDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OrderStatus)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.OrderStatus)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Discount)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.Discount)
+        </dd> 
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.CreatedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ModifiedDate)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.ModifiedDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsDeleted)
+        </dt>
+        <dd class="col-sm-4">
+            @Html.DisplayFor(model => model.IsDeleted)
+        </dd>
+    </dl>
+</div>
+<div class="table">
+    <partial name="OrderDetails" model="Model.OrderDetails" />
+</div>
+ 
+ 

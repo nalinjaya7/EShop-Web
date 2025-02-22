@@ -1,0 +1,207 @@
+﻿@model ShoppingCartViewModel
+
+@{
+    ViewData["Title"] = "Shopping Cart";
+} 
+
+<div>
+    <div>
+        <h5>@ViewData["Title"]</h5>
+    </div>
+</div>
+ 
+<p><div asp-validation-summary="All" class="text-danger"></div></p>
+
+@{                                    
+    await Html.RenderPartialAsync("_AngularGridUIScriptPartial");
+} 
+<script type="text/javascript">
+ 
+    myapp.controller("uigridCtrl", function ($scope,$timeout, $http, uiGridConstants) {
+        $scope.alerts = []; 
+        $scope.linetotal = 0;
+        $scope.gridOptions = {
+            enableCellEdit: false, 
+            enableCellEditOnFocus: true,            
+            enableFiltering: true,
+            enableSorting: true,
+            paginationPageSizes: [25, 50, 75],
+            paginationPageSize: 25,
+            columnDefs: [
+                { field: 'ProductName', enableCellEdit: false, width: '30%', name: 'Product Name' },
+                { field: 'UnitChatName', enableCellEdit: false, width: '10%', name: 'UnitChart Name' },
+                { 
+                    field: 'Quantity', 
+                    width: '15%', 
+                    cellClass: 'gridcell-number-align', 
+                    enableCellEdit: true, enableCellEditOnFocus: true,
+                    cellEditableCondition: function ($scope) {
+                        return true; 
+                    },
+                    cellTemplate: 'ui-grid/cellEditor' 
+                },
+                { field: 'UnitPrice', enableCellEdit: false, width: '15%', cellFilter: 'currencyFilter:this', cellClass: 'gridcell-number-align' },
+                { field: 'GetTotal()', enableCellEdit: false, width: '15%', footerCellTemplate: '<div class="ui-grid-cell-contents gridcell-number-align">{{grid.appScope.netTotal($event, row.entity) | currencyFilter:this}}</div>', cellClass: 'gridcell-number-align', name: 'Total', cellFilter: 'currencyFilter:this', aggregationType: uiGridConstants.aggregationTypes.sum },
+                {
+                    field: ' ',
+                    width: '10%',
+                    exporterSuppressExport: true,
+                    enableFiltering: false, enableCellEdit: false,
+                    enableSorting: false,
+                    cellTemplate: '<div class="ui-grid-cell" style="float:none;text-align:center;align-content:center;">' +
+                        '<i class="glyphicon glyphicon-trash colorred" ng-click="grid.appScope.removeRow($event, row.entity)" title="Delete"></i>&nbsp;&nbsp;' +
+                        '</div>'
+                } 
+            ],
+            onRegisterApi: function (gridApi) {
+                $scope.grid1Api = gridApi;
+                gridApi.selection.on.rowSelectionChanged($scope, function (row) { 
+
+                });
+                gridApi.edit.on.beginCellEdit($scope, function (rowEntity, colDef, event) {
+                   // alert('selected');
+                });
+                gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+                    if (parseFloat(oldValue) != parseFloat(newValue)) {
+                        $http({
+                            method: 'POST',
+                            url: '/ShoppingCarts/UpdateQuantity/' + rowEntity.EnID,
+                            data: {
+                                "ProductID": rowEntity.ProductID, "UnitChartID": rowEntity.UnitChartID, "OldQuantity": parseFloat(oldValue), "NewQuantity": parseFloat(newValue)
+                            }
+                        }).then(function successCallback(response) {
+                            $scope.alerts.push({ msg: (rowEntity.ProductName + ' Quantity Updated Successfully(Old Quantity : ' + oldValue + ' New Quantity : ' + newValue + ')'), type: 'success' });
+                        }, function errorCallback(error) {
+                            $scope.alerts.push({ msg: error.statusText, type: 'danger' });
+                        });
+                        $scope.$apply();
+                    }
+                });
+            }, 
+            enableRowSelection: true,
+            enableGridMenu: true,
+            showGridFooter: true,
+            showColumnFooter: true,
+            enableSelectAll: true,
+            exporterMenuPdf: true,
+            exporterMenuExcel: false,
+            exporterCsvFilename: 'TaxGroups.csv',
+            exporterPdfDefaultStyle: {
+                fontSize: 9
+            },
+            exporterPdfTableStyle: {
+                margin: [30, 30, 30, 30]
+            },
+            exporterPdfTableHeaderStyle: {
+                fontSize: 10,
+                bold: true,
+                italics: true,
+                color: 'red'
+            },
+            exporterPdfHeader: {
+                text: "TaxGroups",
+                style: 'headerStyle'
+            },
+            exporterPdfFooter: function (currentPage, pageCount) {
+                return {
+                    text: currentPage.toString() + ' of ' + pageCount.toString(),
+                    style: 'footerStyle'
+                };
+            },
+            exporterPdfCustomFormatter: function (docDefinition) {
+                docDefinition.styles.headerStyle = {
+                    fontSize: 22,
+                    bold: true
+                };
+                docDefinition.styles.footerStyle = {
+                    fontSize: 10,
+                    bold: true
+                };
+                return docDefinition;
+            },
+            exporterPdfOrientation: 'portrait',
+            exporterPdfPageSize: 'LETTER',
+            exporterPdfMaxGridWidth: 500,
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-wareHouse"))
+        };
+
+        $scope.closeAlert = function (index) {
+            $scope.alerts.splice(index,1);
+        };
+         
+        $scope.gridOptions.data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Items));
+
+        $scope.updateEntity = function (column, row, cellValue) { 
+            row.entity[column.field] = cellValue; 
+        };
+ 
+        angular.forEach($scope.gridOptions.data, function (row) {
+            row.GetTotal = function () {
+                return (this.Quantity * this.UnitPrice);
+            };
+        });
+
+        $scope.netTotal = function ($event, entity) {
+            var Tlinetotal = 0;
+            angular.forEach($scope.gridOptions.data, function (row) {
+                Tlinetotal += (row.Quantity * row.UnitPrice);
+            });
+            return Tlinetotal;
+        };
+       
+        $scope.removeRow = function ($event, entity) {
+            if (confirm('Are you sure to delete this item?') == true) {
+                $http({
+                    method: 'GET',
+                    url: '/ShoppingCarts/DeleteCartItem/' + entity.EnID
+                }).then(function successmethod(response) {
+                   // $event.stopPropagation();
+                   // $scope.gridAccountableHours.data.splice($scope.gridAccountableHours.data.indexOf(entity), 1);
+                    window.location = '/ShoppingCarts'
+                }, function errormethod(response) {
+                    alert(response.data.msg);
+                });
+            }
+        };
+
+    }).filter('currencyFilter', function () {
+        let USDoller = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD' 
+        });
+        return function (value, scope) {
+            return USDoller.format(value);
+        };
+    }); 
+</script>
+
+<style type="text/css">
+
+    .myGrid {
+        width: 100%;
+        height: 555px;
+    }
+
+    .ui-grid-cell a {
+        text-decoration: none;
+    }
+
+
+</style> 
+<div>
+    <div ng-controller="uigridCtrl">
+        <script type="text/ng-template" id="alert.html">
+            <div ng-transclude></div>
+        </script>
+        <div uib-alert ng-repeat="alert in alerts" template-url="alert.html" dismiss-on-timeout="5000" ng-class="'alert-'+alert.type" close="closeAlert($index)">
+            {{alert.msg}}
+        </div>
+        <div ui-grid="gridOptions" ui-grid-pagination ui-grid-auto-resize ui-grid-edit ui-grid-cellNav ui-grid-selection ui-grid-exporter class="myGrid">
+            <div class="gridwatermark" ng-show="!gridOptions.data.length">No data available</div>
+        </div>         
+    </div>
+</div>
+<br/>
+<div style="text-align:right;">
+    @Html.ActionLink("Create Order", "CreateOrder", "Orders", new { id = Model.EnID }, new { @class = "btn btn-default btn-info" })
+</div>

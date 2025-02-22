@@ -1,0 +1,261 @@
+﻿@model ProductViewModel
+@using EShopWeb.Common;
+@{
+    ViewBag.Title = "Product Edit";
+}
+
+<h5>@ViewData["Title"]</h5>  
+@{
+    EShopSystemConfig config = new EShopSystemConfig();
+    SelectList ProductSubCategoryID = ViewBag.ProductSubCategoryID; 
+}
+<div class="row">
+    <div class="col-md-7">
+        <form asp-action="Edit" asp-controller="Products" asp-route-id="@ViewBag.encryptedId" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-horizontal" ng-app="inventoryApp" ng-controller="inventorycontroller">
+                <input asp-for="RowVersion" type="hidden" class="form-control" />
+                <div class="form-group">
+                    <label asp-for="ProductCategoryID" class="control-label"></label>
+                    <select asp-for="ProductCategoryID" ng-change="categoryChanged(ProductCategory)" ng-options="item.Text for item in productCategories track by item.Value"
+                    ng-model="ProductCategory" class="form-control" ></select>
+                    <span asp-validation-for="ProductCategoryID" class="text-danger"></span>
+                </div> 
+
+                <div class="form-group">
+                    <label asp-for="ProductSubCategoryID" class="control-label"></label>
+                    <select asp-for="ProductSubCategoryID" ng-model="ProductSubCategory" ng-options="item.Text for item in productSubCategories track by item.Value" class="form-control"></select>
+                    <span asp-validation-for="ProductSubCategoryID" class="text-danger"></span>
+                </div>
+               
+                <div class="form-group">
+                    <label asp-for="BarCode" class="control-label"></label>
+                    <input asp-for="BarCode" class="form-control" />
+                    <span asp-validation-for="BarCode" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>            
+
+                <div class="form-group">
+                    <label asp-for="ItemCode" class="control-label"></label>
+                    <input asp-for="ItemCode" class="form-control" />
+                    <span asp-validation-for="ItemCode" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ReOrderLevel" class="control-label"></label>
+                    <input asp-for="ReOrderLevel" class="form-control" />
+                    <span asp-validation-for="ReOrderLevel" class="text-danger"></span>
+                </div>
+
+                <div class="form-group form-check">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="TaxInclude" /> @Html.DisplayNameFor(model => model.TaxInclude)
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TaxRate" class="control-label"></label>
+                    <input asp-for="TaxRate" class="form-control" />
+                    <span asp-validation-for="TaxRate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TaxGroupID" class="control-label"></label>
+                    <select asp-for="TaxGroupID" asp-items="@ViewBag.TaxGroupID" class="form-control"></select>
+                    <span asp-validation-for="TaxGroupID" class="text-danger"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label asp-for="ProductImage" class="control-label"></label>
+                    <input asp-for="ProductImage" type="file" class="form-control" />
+                    <span asp-validation-for="ProductImage" class="text-danger"></span>
+                </div>
+ 
+                <div class="form-group"> 
+                    <input type="submit" value="Save" class="btn btn-default btn-info" /> 
+                    <a asp-action="Index" class="btn btn-default btn-info">Back To List</a> 
+                </div>
+
+            </div>
+          </form>
+    </div>
+    <div class="col-md-5">
+        <label class="control-label"></label>
+        <image width="100" height="100" src="@Model.Image"></image>
+    </div>
+</div>
+
+<script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="~/lib/angular.js/angular.js"></script>
+<script type="text/javascript" src="~/lib/angular-route/angular-route.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui/angular-ui.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
+<script type="text/javascript" src="~/lib/angular-ui-bootstrap/ui-bootstrap.js"></script>
+
+<script type="text/javascript">
+ 
+    var myapp = angular.module("inventoryApp", []); 
+
+    myapp.controller("inventorycontroller", function ($scope, $http) {
+
+        $scope.productSubCategories = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ProductSubCategoryID));
+        $scope.productCategories = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ProductCategoryID));
+
+        $scope.ProductCategoryID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductCategoryID));
+        $scope.ProductSubCategoryID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductSubCategoryID));
+        $scope.ProductCategory = $scope.productCategories.find(c => c.Value == $scope.ProductCategoryID);
+        $scope.ProductSubCategory = $scope.productSubCategories.find(c => c.Value == $scope.ProductSubCategoryID);
+
+        $scope.unitChart;
+        $scope.inventoryID = 0;
+        $scope.updateindex = null;
+        $scope.reservedQuantity = 0;
+
+        $scope.categoryChanged = function (ff) {
+            var response = $http({
+                method: 'GET',
+                url: '@Url.Action("GetProductSubCategories","Products")/?CategoryId=' + $scope.ProductCategory.Value
+            }).then(function success(result) {
+                $scope.productSubCategories = result.data.subCategories;
+            }, function error(eror) {
+                console.log(JSON.stringify(eror));
+            });
+        }
+    });
+
+    ////////////////////////////////////Unit Chart/////////////////////////////////////////
+
+    myapp.controller("ModalInstanceCtrl", function ($scope, $uibModalInstance, $http) {
+        $scope.productID = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.EnID));
+        $scope.UnitCharts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.UnitCharts));
+        $scope.baseurl = '@Html.Raw(config.BaseAddress)';
+        $scope.unitChartName = '';
+        $scope.QuantityInBox = 0;
+        $scope.chartupdateindex = null;
+
+        $scope.ok = function () {
+            var response = $http({
+                method: 'PUT',
+                url: '@Url.Action("UpdateUnitChart","Products")?ProductID=' + $scope.productID,
+                data: $scope.UnitCharts
+            }).then(function success(result) {
+                $uibModalInstance.close(result.data.Unitcharts);
+            }, function error(data) {
+                console.log(JSON.stringify(data));
+            });
+        };
+
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        }
+
+        $scope.AddToChartList = function () {
+            let y = -1;
+            if ($scope.UnitCharts == 1) {
+                y = -1;
+                $scope.UnitCharts = [];
+            }
+            else {
+                y = $scope.UnitCharts.findIndex(recd => recd.UnitTypeID == $scope.unitType.ID);
+            }
+            if (y === -1) {
+                $scope.UnitCharts.push(
+                    {
+                        ID: 0,
+                        UnitTypeID: $scope.unitType.ID,
+                        Name: $scope.unitType.Name,
+                        ProductID: $scope.productID,
+                        Quantity: $scope.QuantityInBox,
+                        CreatedDate: (new Date()).toLocaleString(),
+                        ModifiedDate: (new Date()).toLocaleString(),
+                        RowVersion: '',
+                        UnitChartName: $scope.unitChartName,
+                        UnitTypeName: $scope.unitType.Name,
+                        unitType: $scope.unitType
+                    }
+                );
+            }
+            else {
+                alert('Already exists');
+            }
+            $scope.unitType = null;
+            $scope.QuantityInBox = 0;
+        }
+
+        $scope.updateChartItem = function (iteminddex) {
+            $scope.unitType = $scope.unittypes.find(w => w.ID == $scope.UnitCharts[iteminddex].UnitTypeID);
+            $scope.QuantityInBox = $scope.UnitCharts[iteminddex].Quantity;
+            $scope.unitChartName = $scope.UnitCharts[iteminddex].UnitChartName;
+            $scope.chartupdateindex = iteminddex;
+        }
+
+        $scope.updateToChartList = function (iteminddex) {
+            $scope.UnitCharts[iteminddex].UnitTypeID = $scope.unitType.ID;
+            $scope.UnitCharts[iteminddex].Quantity = $scope.QuantityInBox;
+            $scope.chartupdateindex = null;
+            $scope.unitType = null;
+            $scope.QuantityInBox = 0;
+            $scope.UnitCharts[iteminddex].unitType = $scope.unitType;
+            $scope.UnitCharts[iteminddex].UnitChartName = $scope.unitChartName;
+            $scope.unitChartName = '';
+        }
+
+        $scope.removeChartItem = function (itemindex) {
+            if (confirm('Are you sure to delete this unitchart?')) {
+                var unitchart = $scope.UnitCharts[itemindex];
+                if (unitchart.ID == 0) {
+                    $scope.UnitCharts.splice(itemindex, 1);
+                }
+                else {
+                    var response = $http({
+                        method: 'DELETE',
+                        url: '@Url.Action("DeleteUnitChart","Products")?UnitchartID=' + unitchart.ID + "&ProductID=" + $scope.productID
+                    }).then(function success(data) {
+                        $scope.UnitCharts = data.data.unitcharts;
+                    }, function error(data) {
+                        console.log(JSON.stringify(data));
+                    });
+                }
+            }
+        }
+
+        $scope.setdefaultvalues = function () {
+            $scope.quantity = 0;
+            $scope.reservedQuantity = 0;
+            $scope.QuantityInBox = 0;
+        }
+
+        $scope.init = function () {
+            var response2 = $http({
+                method: 'GET',
+                url: '@Url.Action("GetUnitTypes","Products")'
+            }).then(function success(rdata) {
+                $scope.unittypes = rdata.data.UnitTypes;
+            }, function error(data) {
+                console.log(JSON.stringify(data));
+            });
+
+            var response3 = $http({
+                method: 'GET',
+                url: '@Url.Action("GetUnitChartsByProduct", "Products")?ProductID=' + $scope.productID
+            }).then(function success(data) {
+                $scope.UnitCharts = data.data.Unitcharts;
+            }, function error(data) {
+                console.log(JSON.stringify(data));
+            });
+        }
+    });
+
+</script> 
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_AdminValidationScriptsPartial");
+    }
+}

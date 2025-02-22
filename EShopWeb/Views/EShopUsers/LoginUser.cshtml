@@ -1,0 +1,52 @@
+﻿@using EShopModels.Common
+@model LoginView
+@{ 
+    ViewBag.Title = "Log in";
+}
+<h5>@ViewData["Title"]</h5>
+ 
+<div class="row">
+    <div class="col-md-7">
+        <section>
+            <form novalidate asp-action="LoginUser" asp-controller="EShopUsers" id="account" method="post">
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                <div class="flex-container form-group" style="margin-bottom:5px;">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div> 
+                
+                <div class="flex-container form-group">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                </div>
+
+                <div class="flex-container form-group">
+                    <label style="width:22%;" asp-for="RememberMe"></label>
+                    <div style="margin-top:11px;" class="checkbox">
+                        <label asp-for="RememberMe">
+                            <input asp-for="RememberMe" />
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Log in</button>
+                </div>
+                <div class="form-group">                    
+                    <p>
+                        <a asp-action="Register" asp-controller="EShopUsers">Register as a new user</a>
+                    </p> 
+                </div>
+            </form>
+        </section>
+    </div>
+ 
+</div>
+
+ 
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

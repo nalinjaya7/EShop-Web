@@ -1,0 +1,478 @@
+﻿@model ProductPromotionViewModel
+@{ await Html.RenderPartialAsync("_AngularGridUIScriptPartial");}
+@{
+    ViewBag.Title = "Product Promotion Edit";
+}
+<h5>@ViewData["Title"]</h5>
+<div class="row">
+    <div class="col-md-7">
+        @using (Html.BeginForm("Edit", "ProductPromotions", new { id = ViewBag.encryptedId }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+
+            <div ng-app="userApp" ng-controller="userControllr" class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.Code)
+                @Html.HiddenFor(model => model.RowVersion)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+
+                <div>
+
+                    <div style="float:left;width:48%;" class="form-group">
+                        @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label" })
+                        <datepicker date-format="yyyy-MM-dd" date-min-limit="2000/01/01" date-max-limit="@(DateTime.Now)" button-next='<i class="glyphicon glyphicon-circle-arrow-right"></i>' button-prev='<i class="glyphicon glyphicon-circle-arrow-left"></i>' selector="form-control">
+                            <div class="input-group">
+                                <input ng-model="startDate" type="date" id="startDate" name="startDate" class="form-control" value="@(DateTime.Now)" placeholder="start date" />
+                            </div>
+                        </datepicker>
+                        @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div style="float:right;width:48%;" class="form-group">
+                        @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label" })
+                        <datepicker date-format="yyyy-MM-dd" date-min-limit="2000/01/01" date-max-limit="@(DateTime.Now)" button-next='<i class="glyphicon glyphicon-circle-arrow-right"></i>' button-prev='<i class="glyphicon glyphicon-circle-arrow-left"></i>' selector="form-control">
+                            <div class="input-group">
+                                <input ng-model="endDate" type="date" id="endDate" name="endDate" class="form-control" value="@(DateTime.Now)" placeholder="end date" />
+                            </div>
+                        </datepicker>
+                        @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <div class="form-group">
+                        @Html.Label("User Group", "User Group", htmlAttributes: new { @class = "control-label" })
+                        <select id="userGroups" ng-change="onuserGroupsChanged(userGroupId)" ng-model="userGroupId" class="form-control">
+                            <option ng-repeat="inv in userGroups" value="{{inv.ID}}">{{inv.GroupName}}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("User", "User", htmlAttributes: new { @class = "control-label" })
+                    </div>
+
+                    <div>
+                        <div class="form-group" style="width:80%;float:left;">
+                            <select id="userID" ng-change="onuserChanged(userId)" ng-model="userId" class="form-control">
+                                <option ng-repeat="cus in users" value="{{cus.value}}">{{cus.text}}</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="width:18%;float:right;">
+                            <input type="button" value="Add To List" ng-click="addUsertoList()" class="btn btn-default btn-info" id="btnAddUser" />
+                        </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="form-group">
+                        <table id="userdetails" style="width:98%;" class="webgrid-table">
+                            <thead>
+                                <tr class="webgrid-header">
+                                    <th scope="col"><a href="#">User Name</a></th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in ProductPromotionUsers track by $index" ng-class="{true:'webgrid-alternating-row',false:'webgrid-row-style'}[$index%2==0]">
+                                    <td>
+                                        <input type="hidden" value="{{item.UserID}}" name="ProductPromotionUsers[{{$index}}].UserID" />
+                                        <input type="hidden" value="{{item.ProductPromotionID}}" name="ProductPromotionUsers[{{$index}}].ProductPromotionID" />
+                                        {{item.User.Name}}
+                                    </td>
+                                    <td>
+                                        <i class="glyphicon glyphicon-trash colorred deleterow" ng-click="removeUsersItem($index)" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Product SubCategory", "Product SubCategory", htmlAttributes: new { @class = "control-label" })
+                        <select id="Productcategories" ng-change="onProductsubCategoryChanged(subcategoryID)" style="float:left" ng-model="subcategoryID" class="form-control">
+                            <option ng-repeat="prdcat in productcategories" value="{{prdcat.Value}}">{{prdcat.Text}}</option>
+                        </select> &nbsp;
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Products", "Products", htmlAttributes: new { @class = "control-label" })
+                    </div>
+
+                    <div>
+                        <div class="form-group" style="width:80%;float:left;">
+                            <select id="Products" ng-change="onProductsChanged(productID)" ng-model="productID" class="form-control">
+                                <option ng-repeat="prd in Products" value="{{prd.value}}">{{prd.text}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="width:18%;float:right;">
+                            <input type="button" value="Add To List" ng-click="addProductToList()" class="btn btn-default btn-info" id="btnAddProduct" />
+                        </div>
+                    </div>
+
+                    <div class="clearfix"></div>
+
+                    <div class="form-group">
+                        <table style="width:98%" id="salesorderdetails" class="webgrid-table">
+                            <thead>
+                                <tr class="webgrid-header">
+                                    <th scope="col"><a href="#">Product Name</a></th>
+                                    <th scope="col"><a href="#">BarCode</a></th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in ProductPromotionDetails track by $index" ng-class="{true:'webgrid-alternating-row',false:'webgrid-row-style'}[$index%2==0]">
+                                    <td>
+                                        <input type="hidden" value="{{item.ID}}" name="ProductPromotionDetails[{{$index}}].ID" />
+                                        <input type="hidden" value="{{item.Code}}" name="ProductPromotionDetails[{{$index}}].Code" />
+                                        <input type="hidden" value="{{item.ProductID}}" name="ProductPromotionDetails[{{$index}}].ProductID" />
+                                        {{item.ProductName}}
+                                    </td>
+                                    <td>
+                                        {{item.ProductItemCode}}
+                                        <input type="hidden" value="{{item.ProductItemCode}}" name="ProductPromotionDetails[{{$index}}].ProductItemCode" />
+                                        <input type="hidden" value="{{item.ProductBarCode}}" name="ProductPromotionDetails[{{$index}}].ProductBarCode" />
+                                        <input type="hidden" value="{{item.ProductName}}" name="ProductPromotionDetails[{{$index}}].ProductName" />
+                                    </td>
+                                    <td>
+                                        <i class="glyphicon glyphicon-trash colorred deleterow" ng-click="removeProductItem($index)" title="Delete"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DayType, htmlAttributes: new { @class = "control-label" })
+                        <select class="form-control" asp-for="DayType" asp-items="Html.GetEnumSelectList<EShopModels.Common.DayType>()">
+                            <option selected="selected" value="">Please Select</option>
+                        </select>
+                        @Html.ValidationMessageFor(model => model.DayType, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        <div id="divdaylist" class="form-group">
+                            @Html.Label("Days", "Days", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <fieldset>
+                                &nbsp;<input type="checkbox" name="weekday" id="weekday" value="1" /> &nbsp;<label for="sunday">SunDay</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="2" /> &nbsp;<label for="monday">MonDay</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="3" /> &nbsp;<label for="Tuesday">Tuesday</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="4" /> &nbsp;<label for="Wednesday">Wednesday</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="5" /> &nbsp;<label for="Thursday">Thursday</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="6" /> &nbsp;<label for="Friday">Friday</label> &nbsp; &nbsp; &nbsp;
+                                <input type="checkbox" name="weekday" id="weekday" value="7" /> &nbsp;<label for="Saturday">Saturday</label>&nbsp; &nbsp; &nbsp;
+                            </fieldset>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsEntireDay, htmlAttributes: new { @class = "control-label", @style = "padding-top:0px;" })
+                            @Html.EditorFor(model => model.IsEntireDay, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.IsEntireDay, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div>
+                            <div id="stime" style="float:left;width:48%;" class="form-group">
+                                @Html.LabelFor(model => model.StartTime, htmlAttributes: new { @class = "control-label" })
+                                @Html.EditorFor(model => model.StartTime, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.StartTime, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div id="etime" style="float:right;width:48%;" class="form-group">
+                                @Html.LabelFor(model => model.EndTime, htmlAttributes: new { @class = "control-label" })
+                                @Html.EditorFor(model => model.EndTime, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.EndTime, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ApplyType, htmlAttributes: new { @class = "control-label" })
+                        <select class="form-control" asp-for="ApplyType" asp-items="Html.GetEnumSelectList<EShopModels.Common.PromotionApplyType>()">
+                            <option selected="selected" value="">Please Select</option>
+                        </select>
+                        @Html.ValidationMessageFor(model => model.ApplyType, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div id="DivDiscountProductID" class="form-group">
+                        @Html.LabelFor(model => model.DiscountProductID, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownList("DiscountProductID", null, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.DiscountProductID, "", new { @class = "text-danger" })
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Amount", "Amount", new { @class = "control-label", id = "amtqty" })
+                    @Html.EditorFor(model => model.ApplyAmount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ApplyAmount, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DiscountType, htmlAttributes: new { @class = "control-label" })
+                    <select asp-for="DiscountType" class="form-control" asp-items="Html.GetEnumSelectList<EShopModels.Common.DiscountType>()">
+                        <option selected="selected" value="">Please Select</option>
+                    </select>
+                    @Html.ValidationMessageFor(model => model.DiscountType, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.Label("Discount Amount", "Discount Amount", new { @class = "control-label", id = "disamt" })
+                    @Html.EditorFor(model => model.DiscountAmount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DiscountAmount, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="form-group">
+                    <input type="submit" class="btn btn-default btn-info" value="Save" />
+                    @Html.ActionLink("Back to List", "Index", null, null, new { @class = "btn btn-default btn-info" })
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+
+<script type="text/javascript">
+    var customrapp = angular.module("userApp", []);
+    customrapp.controller("userControllr", function ($scope, $http) {
+        $scope.userGroups = [];
+        $scope.users = [];
+        $scope.userGroupId = 0;
+        $scope.userId = 0;
+
+        $scope.userGroups = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewData["UserGroup"]));
+
+        $scope.onuserGroupsChanged = function(groupId) {
+            var response = $http({
+                method: 'GET',
+                url: '/Users/GetUsersByGroup',
+                params: { 'UserGroupId': $scope.userGroupId },
+                headers: { 'Content-Type': 'application/json' }
+            }).then(function success(data) {
+                $scope.users = data.data;
+                //console.log(JSON.stringify($scope.users));
+            }, function error(data) {
+                alert(data);
+            });
+        }
+
+        $scope.addUsertoList = function()
+        {
+            let PromoID = 0;// Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.encryptedId));
+            let itmtoadd = $scope.users.find(h => h.ID == $scope.userId);
+            let isAlreadyexists = -1;
+            if ($scope.ProductPromotionUsers != null) {
+                isAlreadyexists = $scope.ProductPromotionUsers.findIndex(f => f.UserID == $scope.userId);
+            }
+            if (itmtoadd != null) {
+                if (isAlreadyexists === -1) {
+                    $scope.ProductPromotionUsers.push({
+                        UserID: itmtoadd.ID,
+                        User: { Name: itmtoadd.Name },
+                        ProductPromotionID: PromoID
+                    });
+                }
+                else {
+                    alert('Already exists');
+                }
+            }
+        }
+
+        $scope.productcategories = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewData["ProductSubCategoryID"]));
+        $scope.Products = [];
+        $scope.ProductPromotionDetails = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ProductPromotionDetails));
+        $scope.productID = 0;
+        $scope.selectedProduct;
+        $scope.subcategoryID = 0;
+
+        $scope.addProductToList = function () {
+            let isAlreadyexists = -1;
+            if ($scope.ProductPromotionDetails != null) {
+                isAlreadyexists = $scope.ProductPromotionDetails.findIndex(f => f.ProductID == $scope.productID);
+            }
+            let itmtoadd = $scope.Products.find(h => h.ID == $scope.productID);
+
+            if (itmtoadd != null) {
+                if (isAlreadyexists === -1) {
+                    $scope.ProductPromotionDetails.push({
+                        ID: 0,
+                        ProductPromotionID: 0,
+                        ProductID: itmtoadd.ID,
+                        ProductItemCode: itmtoadd.ItemCode,
+                        ProductBarCode: itmtoadd.ItemCode,
+                        ProductName: itmtoadd.Name
+                    });
+                } else {
+                    alert('Already exists');
+                }
+            }
+        }
+
+        $scope.onProductsubCategoryChanged = function (subcategoryID) {
+            var response = $http({
+                method: 'GET',
+                url: '/Products/GetProductBySubCategory',
+                params: { 'SubCategory': subcategoryID }
+            }).then(function succssCallback(data) {
+                $scope.Products = data.data;
+                console.log(JSON.stringify($scope.Products));
+                }, function error(data) {
+                    alert(data);
+                });
+        }
+
+        $scope.onProductsChanged = function (productID) {
+            $scope.selectedProduct = $scope.Products.find(j => j.ID == productID);
+        }
+
+        $scope.removeUsersItem = function(itemIndex) {
+            if (confirm('Are you sure to remove this user?') == true) {
+                $scope.ProductPromotionUsers.splice(itemIndex, 1);
+            }
+        }
+
+        $scope.removeProductItem = function (itemIndex) {
+            if (confirm('Are you sure to remove this product?') == true) {
+                $scope.ProductPromotionDetails.splice(itemIndex, 1);
+            }
+        }
+    });
+
+    $(document).ready(function () {
+        var selectedtxt = $('#ApplyType').children("option:selected").text();
+        if (selectedtxt == 'Quantity') {
+            $("#amtqty").text('Quantity');
+            $("#DivDiscountProductID").show();
+        }
+        if (selectedtxt == 'Value') {
+            $("#amtqty").text('Value');
+            $("#DivDiscountProductID").hide();
+        }
+        $("#ApplyType").change(function () {
+            var value = $(this).val();
+            var selectedtxt = $(this).children("option:selected").text();
+            if (selectedtxt == 'Quantity') {
+                $("#amtqty").text('Quantity');
+                $("#DivDiscountProductID").show();
+            }
+            if (selectedtxt == 'Value') {
+                $("#amtqty").text('Value');
+                $("#DivDiscountProductID").hide();
+            }
+        });
+
+        var selectedtxtday = $('#DayType').children("option:selected").text();
+        if (selectedtxtday == 'EveryDay') {
+            $("#divdaylist").hide();
+        }
+        if (selectedtxtday == 'WeekDay') {
+            $("#divdaylist").show();
+        }
+
+        $("#DayType").change(function () {
+            var value = $(this).val();
+            var selectedtxtdat = $(this).children("option:selected").text(); 0
+
+            if (selectedtxtdat == 'EveryDay') {
+                $("#divdaylist").hide();
+            }
+            if (selectedtxtdat == 'WeekDay') {
+                $("#divdaylist").show();
+            }
+        });
+
+        var disselectedtxt = $('#DiscountType').children("option:selected").text();
+        if (disselectedtxt == 'Amount') {
+            $("#disamt").text('Amount');
+        }
+        if (disselectedtxt == 'Percentage') {
+            $("#disamt").text('Percentage');
+        }
+        if (disselectedtxt == 'Quantity') {
+            $("#disamt").text('Quantity');
+        }
+        $("#DiscountType").change(function () {
+            var value = $(this).val();
+            var selectedtxtdis = $(this).children("option:selected").text();
+
+            if (selectedtxtdis == 'Amount') {
+                $("#disamt").text('Amount');
+            }
+            if (selectedtxtdis == 'Percentage') {
+                $("#disamt").text('Percentage');
+            }
+            if (selectedtxtdis == 'Quantity') {
+                $("#disamt").text('Quantity');
+            }
+        });
+
+        var ischckd = $('#IsEntireDay').is(":checked");
+        if (ischckd) {
+            $('#stime').hide();
+            $('#etime').hide();
+        }
+        else {
+            $('#stime').show();
+            $('#etime').show();
+        }
+
+        $("#IsEntireDay").change(function () {
+            var ischckd1 = $('#IsEntireDay').is(":checked");
+            if (ischckd1) {
+                $('#stime').hide();
+                $('#etime').hide();
+            }
+            else {
+                $('#stime').show();
+                $('#etime').show();
+            }
+        });
+    });
+
+</script>
+
+<style type="text/css">
+    fieldset {
+        border-top-color: #ccc;
+        border-top-style: solid;
+        border-top-width: 1px;
+        border-right-color: #ccc;
+        border-right-style: solid;
+        border-right-width: 1px;
+        border-bottom-color: #ccc;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-left-color: #ccc;
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-image-source: none;
+        border-image-slice: initial;
+        border-image-width: initial;
+        border-image-outset: initial;
+        border-image-repeat: initial;
+        border-radius: 5px;
+        margin: 1px;
+    }
+
+    legend {
+        width: 15%;
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_AdminValidationScriptsPartial");
+    }
+}

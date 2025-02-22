@@ -1,0 +1,114 @@
+﻿@model IEnumerable<EShopModels.EShopUser>
+@{
+    ViewBag.Title = "Users";
+}
+<div>
+    <div>
+        <h5>@ViewData["Title"]</h5>
+    </div> 
+</div>
+<br />
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@{ await Html.RenderPartialAsync("_AngularGridUIScriptPartial");}
+
+<script type="text/javascript">
+
+    var app = angular.module("uigridApp", ["ui.grid", "ui.grid.pagination", "ui.grid.selection", "ui.grid.exporter"]);
+
+    app.controller("uigridCtrl", function ($scope) {
+
+        $scope.gridOptions = {
+            enableFiltering: true,
+            enableSorting: true,
+            paginationPageSizes: [25, 50, 75],
+            paginationPageSize: 25,
+            columnDefs: [
+                { field: 'UserName', name: 'User Name', width: '25%' },
+                { field: 'Email', width: '25%' },
+                { field: 'IsActive', width: '10%' },
+                { field: 'ActivationCode', name: 'Activation Code', width: '20%'},
+                { field: 'FullName', name: 'Full Name', width: '25%' },
+                {
+                    field: ' ',
+                    width: '10%',
+                    exporterSuppressExport: true,
+                    enableFiltering: false,
+                    enableSorting: false,
+                    cellTemplate: '<div class="ui-grid-cell">&nbsp;<a href="/EShopUsers/Edit/{{row.entity.EnID}}"><i class="glyphicon glyphicon-edit colorspringgreen" title="Edit"></i>&nbsp;&nbsp;</a><a href="/EShopUsers/Details/{{row.entity.EnID}}"><i class="glyphicon glyphicon-eye-open" title="Details"></i>&nbsp;&nbsp;</a><a href="/EShopUsers/Delete/{{row.entity.EnID}}">' +
+                        '<i ng-if="row.entity.IsDeleted==false" class="glyphicon glyphicon-trash colorred" title="Delete"></i>' +
+                        '<i ng-if="row.entity.IsDeleted==true" class="glyphicon glyphicon-open colorspringgreen" title="Delete"></i>' +
+                        '</a></div>'
+                }
+            ],
+            onRegisterApi: function (gridApi) {
+                $scope.grid1Api = gridApi;
+            },
+            enableRowSelection: true,
+            enableGridMenu: true,
+            enableSelectAll: true,
+            exporterMenuPdf: true,
+            exporterMenuExcel: false,
+            exporterCsvFilename: 'Users.csv',
+            exporterPdfDefaultStyle: {
+                fontSize: 9
+            },
+            exporterPdfTableStyle: {
+                margin: [30, 30, 30, 30]
+            },
+            exporterPdfTableHeaderStyle: {
+                fontSize: 10,
+                bold: true,
+                italics: true,
+                color: 'red'
+            },
+            exporterPdfHeader: {
+                text: "Users",
+                style: 'headerStyle'
+            },
+            exporterPdfFooter: function (currentPage, pageCount) {
+                return {
+                    text: currentPage.toString() + ' of ' + pageCount.toString(),
+                    style: 'footerStyle'
+                };
+            },
+            exporterPdfCustomFormatter: function (docDefinition) {
+                docDefinition.styles.headerStyle = {
+                    fontSize: 22,
+                    bold: true
+                };
+                docDefinition.styles.footerStyle = {
+                    fontSize: 10,
+                    bold: true
+                };
+                return docDefinition;
+            },
+            exporterPdfOrientation: 'portrait',
+            exporterPdfPageSize: 'LETTER',
+            exporterPdfMaxGridWidth: 500,
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-wareHouse"))
+        };
+        $scope.users = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
+        $scope.gridOptions.data = $scope.users;
+    });
+
+</script>
+
+<style type="text/css">
+    .myGrid {
+        width: 100%;
+        height: 555px;
+    }
+
+    .ui-grid-cell a {
+        text-decoration: none;
+    }
+</style>
+
+<div ng-app="uigridApp">
+    <div ng-controller="uigridCtrl">
+        <div ui-grid="gridOptions" ui-grid-pagination ui-grid-auto-resize ui-grid-selection ui-grid-exporter class="myGrid">
+            <div class="gridwatermark" ng-show="!gridOptions.data.length">No data available</div>
+        </div>
+    </div>
+</div>
